@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactMarkdown from "react-markdown";
 import breaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 
 type Message = {
   sender: "user" | "bot";
@@ -94,7 +95,7 @@ const App: React.FC = () => {
         }
 
         // escape ordered list that gets removed by markdown
-        // answer = answer.replace(/\n(\d+)\./g, "\n$1) ");
+        answer = answer.replace(/(\d+)\. /g, "$1. ");
         answer = answer.replace(/\n/g, "  \n");
         // eslint-disable-next-line no-loop-func
         setMessages((prevMessages) => {
@@ -124,7 +125,7 @@ const App: React.FC = () => {
               <ReactMarkdown
                 children={message.text}
                 remarkPlugins={[remarkGfm]}
-                rehypePlugins={[breaks]}
+                rehypePlugins={[rehypeRaw]}
               />
             ) : (
               <p>{message.text}</p>
