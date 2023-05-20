@@ -27,7 +27,7 @@ const App: React.FC = () => {
     setInput("");
     setLoading(true);
 
-    const response = await fetch("http://localhost:8000/v1/completions", {
+    const response = await fetch("http://192.168.1.163:8000/v1/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -39,7 +39,18 @@ const App: React.FC = () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder("utf-8");
       let answer = "";
-      let isFirstIteration = true;
+      let botResponseIndex = 0;
+      setMessages((prevMessages) => {
+        const updatedMessages: Message[] = [
+          ...prevMessages,
+          { sender: "user", text: input },
+          { sender: "bot", text: "" },
+        ];
+        botResponseIndex = updatedMessages.length - 1;
+
+        return updatedMessages;
+      });
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -53,18 +64,32 @@ const App: React.FC = () => {
 
         // escape ordered list that gets removed by markdown
         answer = answer.replace(/(\d+)\./g, "\n$1) ");
+        // eslint-disable-next-line no-loop-func
+        setMessages((prevMessages) => {
+          const updatedMessages = [...prevMessages];
+          updatedMessages[botResponseIndex] = { sender: "bot", text: answer };
+          return updatedMessages;
+        });
 
-        if (messages.length > 0 && !isFirstIteration) {
-          messages[messages.length - 1].text = answer;
-          setMessages([...messages]);
-        } else {
-          setMessages([
-            ...messages,
-            { sender: "user", text: input },
-            { sender: "bot", text: answer },
-          ]);
-          isFirstIteration = false;
-        }
+        // if (isFirstIteration) {
+        //   console.log("CHECK2", messages);
+        //   // setMessages([
+        //   //   ...messages,
+        //   //   { sender: "user", text: input },
+        //   //   { sender: "bot", text: answer },
+        //   // ]);
+        //   // eslint-disable-next-line no-loop-func
+        //   setMessages((prevMessages) => [
+        //     ...prevMessages,
+        //     { sender: "user", text: input },
+        //     { sender: "bot", text: answer },
+        //   ]);
+        //   isFirstIteration = false;
+        // } else {
+        //   console.log("CHECK1", messages);
+        //   messages[messages.length - 1].text = answer;
+        //   // setMessages([...newMessages]);
+        // }
       }
 
       // const answer = JSON.parse(result).choices[0].text;
@@ -85,7 +110,7 @@ const App: React.FC = () => {
           <div
             key={index}
             className={`mb-2 p-2 rounded ${
-              message.sender === "user" ? "bg-blue-500" : "bg-green-500"
+              message.sender === "user" ? "bg-gray-700" : "bg-gray-600"
             }`}
           >
             <strong className="font-bold">{message.sender}:</strong>
