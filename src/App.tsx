@@ -32,7 +32,7 @@ const App: React.FC = () => {
       { sender: "user", text: input },
     ]);
 
-    const response = await fetch("http://192.168.1.163:8000/v1/completions", {
+    const response = await fetch("http://0.0.0.0:8000/v1/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -55,7 +55,7 @@ const App: React.FC = () => {
     setInput("");
     setLoading(true);
 
-    const response = await fetch("http://192.168.1.163:8000/v1/completions", {
+    const response = await fetch("http://0.0.0.0:8000/v1/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
